@@ -1,0 +1,24 @@
+#!/bin/bash
+PERL_SCRIPT=/usr/bin/fastcgi-wrapper.pl
+FASTCGI_USER=www-data
+RETVAL=0
+case "$1" in
+    start)
+      su - $FASTCGI_USER -c $PERL_SCRIPT
+      RETVAL=$?
+  ;;
+    stop)
+      killall -9 fastcgi-wrapper.pl
+      RETVAL=$?
+  ;;
+    restart)
+      killall -9 fastcgi-wrapper.pl
+      su - $FASTCGI_USER -c $PERL_SCRIPT
+      RETVAL=$?
+  ;;
+    *)
+      echo "Usage: perl-fastcgi {start|stop|restart}"
+      exit 1
+  ;;
+esac      
+exit $RETVAL
