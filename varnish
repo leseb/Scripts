@@ -1,0 +1,17 @@
+START=yes
+NFILES=131072
+MEMLOCK=82000
+INSTANCE=$(uname -n)
+DAEMON_OPTS="-a :80 \
+        -T localhost:6082
+        -p thread_pool_add_delay=2
+        -p thread_pools=4
+        -p thread_pool_min=200
+        -p thread_pool_max=4000
+        -p session_linger=100
+        -f /etc/varnish/manabey.vcl
+        -S /etc/varnish/secret
+	-s malloc,2G"
+
+#-s malloc,3G"
+#-s file,/var/lib/varnish/$INSTANCE/varnish_storage.bin,1G"

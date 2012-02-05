@@ -1,0 +1,43 @@
+## Hardening ssh conf Leseb
+# Port
+Port 22 
+
+# Protocol to use
+Protocol 2
+
+#ListenAddress votre_ip
+
+# Automatically disconnect session due to inactivity (5min)
+ClientAliveInterval 300
+ClientAliveCountMax 0
+
+# Restrict SSH access to user groups
+AllowGroups ssh-users
+
+# KeyBit Lenght
+ServerKeyBits 1024
+
+# Disable root ssh login
+PermitRootLogin no
+
+# Disable key authentification
+PubkeyAuthentication yes
+
+# Ignore SSH can emulate the behavior of the obsolete rsh command, just disable insecure access via RSH
+IgnoreRhosts yes
+
+# Enable password authentification
+PasswordAuthentication no
+
+# Pam + ssh
+UsePAM yes
+
+# Enable tunneling compression 
+Compression yes
+
+# Hardening
+AllowTcpForwarding no
+X11Forwarding no
+
+# Check file permission (ssh keys, know hosts...)
+StrictModes yes
