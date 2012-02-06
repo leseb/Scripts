@@ -73,7 +73,7 @@ sub vcl_recv {
     }
 
     # Don't cache pages for Magento Admin
-    if (req.url ~ "^/(index.php/)?bo") {
+    if (req.url ~ "^/(index.php/)?admin") {
         return(pass);
     }
 
