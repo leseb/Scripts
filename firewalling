@@ -12,6 +12,8 @@
 
 IPTABLE=/sbin/iptables
 
+IP_GRANTED=XXX.XXX.XXX.XXX
+
 # Vider les tables actuelles
 $IPTABLE -t filter -F
 
@@ -63,36 +65,6 @@ $IPTABLE -t filter -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 # FTP passive mode
 $IPTABLE -t filter -A INPUT -i eth0 -m state --state NEW -p tcp --dport 60000:61000 -j ACCEPT
 
-# Varnish In
-$IPTABLE -t filter -A INPUT -p tcp --dport 6082 -j ACCEPT
-
-# Varnish Out
-$IPTABLE -t filter -A OUTPUT -p tcp --dport 6082 -j ACCEPT
-
-# Mail SMTP:25
-#$IPTABLE -t filter -A INPUT -p tcp --dport 25 -j ACCEPT
-#$IPTABLE -t filter -A OUTPUT -p tcp --dport 25 -j ACCEPT
-
-# Mail SSL SMTP:465
-$IPTABLE -t filter -A INPUT -p tcp --dport 465 -j ACCEPT
-$IPTABLE -t filter -A OUTPUT -p tcp --dport 465 -j ACCEPT
-
-# Mail Secure SMTP:3535 GoDaddy
-#$IPTABLE -t filter -A INPUT -p tcp --dport 3535 -j ACCEPT
-#$IPTABLE -t filter -A OUTPUT -p tcp --dport 3535 -j ACCEPT
-
-# Mail POP3:110
-#$IPTABLE -t filter -A INPUT -p tcp --dport 110 -j ACCEPT
-#$IPTABLE -t filter -A OUTPUT -p tcp --dport 110 -j ACCEPT
-
-# Mail IMAP:143
-#$IPTABLE -t filter -A INPUT -p tcp --dport 143 -j ACCEPT
-#$IPTABLE -t filter -A OUTPUT -p tcp --dport 143 -j ACCEPT
-
-# Mail POP3S:995
-#$IPTABLE -t filter -A INPUT -p tcp --dport 995 -j ACCEPT
-#$IPTABLE -t filter -A OUTPUT -p tcp --dport 995 -j ACCEPT
-
 # SVN
 $IPTABLES -t filter -A OUTPUT -p tcp --dport 3690 -j ACCEPT
 
@@ -101,11 +73,7 @@ $IPTBLES -t filter -A INPUT -p tcp --dport 3306 -j ACCEPT
 
 # White list SSH
 $IPTABLE -N SSH_WHITELIST
-$IPTABLE -A SSH_WHITELIST -s 82.228.104.16 -m recent --remove --name SSH -j ACCEPT
-$IPTABLE -A SSH_WHITELIST -s 96.31.73.154 -m recent --remove --name SSH -j ACCEPT
-$IPTABLE -A SSH_WHITELIST -s 121.32.102.176 -m recent --remove --name SSH -j ACCEPT
-$IPTABLE -A SSH_WHITELIST -s 121.8.228.7 -m recent --remove --name SSH -j ACCEPT
-$IPTABLE -A SSH_WHITELIST -s 64.120.28.2 -m recent --remove --name SSH -j ACCEPT
+$IPTABLE -A SSH_WHITELIST -s $IP_GRANTED -m recent --remove --name SSH -j ACCEPT
 
 $IPTABLE -A INPUT -p tcp --dport 5643 -m state --state NEW -m recent --set --name SSH
 $IPTABLE -A INPUT -p tcp --dport 5643 -m state --state NEW -j SSH_WHITELIST
