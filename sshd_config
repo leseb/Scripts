@@ -17,8 +17,17 @@ AllowGroups ssh-users
 # KeyBit Lenght
 ServerKeyBits 1024
 
+# Enable a warning banner
+Banner /etc/issue
+
+# Disable empty passwords
+PermitEmptyPasswords no
+
 # Disable root ssh login
 PermitRootLogin no
+
+# No not allow users to set environment options
+PermitUserEnvironment no
 
 # Disable key authentification
 PubkeyAuthentication yes
@@ -28,6 +37,9 @@ IgnoreRhosts yes
 
 # Enable password authentification
 PasswordAuthentication no
+
+# Disable host-based authentication
+HostbasedAuthentication no
 
 # Pam + ssh
 UsePAM yes
@@ -41,3 +53,6 @@ X11Forwarding no
 
 # Check file permission (ssh keys, know hosts...)
 StrictModes yes
+
+# Use only approved Ciphers in Counter mode
+Ciphers aes128-ctr,aes192-ctr,aes256-ctr
