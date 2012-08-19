@@ -14,6 +14,17 @@
 # Version 1.0
 #
 
+### BEGIN INIT INFO
+# Provides: mysqld_multi
+# Required-Start: $local_fs $network $remote_fs
+# Should-Start: ypbind nscd ldap ntpd xntpd
+# Required-Stop: $local_fs $network $remote_fs
+# Default-Start:  2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop multiple MySQL daemons
+# Description: MySQL is a very fast and reliable SQL database engine.
+### END INIT INFO
+
 bindir=/usr/bin
 
 if test -x $bindir/mysqld_multi
