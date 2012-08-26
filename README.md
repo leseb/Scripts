@@ -1,1 +1,1 @@
-# Just a bunch of script and config files!
+# Just a bunch of scripts and config files!
