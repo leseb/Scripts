@@ -1,0 +1,78 @@
+name: ocp
+on: [pull_request]
+
+jobs:
+  ocp:
+    # macos is the only hypervisor that supports nested virt -_-
+    runs-on: macos-11
+    # timeout-minutes: 40
+    env:
+      CRC_DIR: ./crc-macos-1.25.0-amd64
+    steps:
+      - name: sysinfo
+        run: |
+          df -h
+          sysctl hw
+
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: install oc
+        uses: redhat-actions/oc-installer@v1
+        with:
+          version: "4.7"
+
+      # Getting started doc: https://code-ready.github.io/crc/
+      - name: install crc
+        # timeout-minutes: 3 # sometimes this step take up to 18 minutes doing where in most cases takes barely 2mins, see
+        # install crc      18m 47s
+        # Tue, 26 Jan 2021 15:50:06 GMT # Run wget --quiet https://mirror.openshift.com/pub/openshift-v4/clients/crc/latest/crc-macos-amd64.tar.xz
+        # Tue, 26 Jan 2021 15:56:34 GMT # x crc-macos-1.21.0-amd64/
+        # Tue, 26 Jan 2021 15:56:34 GMT # x crc-macos-1.21.0-amd64/LICENSE
+        # Tue, 26 Jan 2021 15:56:34 GMT # x crc-macos-1.21.0-amd64/doc.pdf
+        # Tue, 26 Jan 2021 16:02:26 GMT # x crc-macos-1.21.0-amd64/crc
+        # Tue, 26 Jan 2021 16:08:53 GMT # CodeReady Containers version: 1.21.0+68a4cdd7
+        # Tue, 26 Jan 2021 16:08:53 GMT # OpenShift version: 4.6.9 (embedded in executable)
+        run: |
+          curl -L https://mirror.openshift.com/pub/openshift-v4/clients/crc/latest/crc-macos-amd64.pkg -o crc-macos-amd64.pkg
+          sudo installer -pkg crc-macos-amd64.pkg -target /
+          sudo chown root:wheel /Users/runner/Library/LaunchAgents/crc.tray.plist
+          sudo launchctl load -w -F /Users/runner/Library/LaunchAgents/crc.tray.plist
+
+      # usually takes around 5min
+      - name: configure crc
+        working-directory: ${{ env.CRC_DIR }}
+        run: |
+          test -z $OCP_PULL_SECRET && echo "OCP_PULL_SECRET is empty" && exit 1
+          # crc delete || true
+          # sudo crc cleanup || true
+          crc setup
+          echo -n "$OCP_PULL_SECRET" > secret
+          crc config set pull-secret-file secret
+          crc config view
+        env:
+          OCP_PULL_SECRET: ${{ secrets.OCP_PULL_SECRET }}
+
+      # usually takes around 10min: https://github.com/leseb/Scripts/runs/1770281072
+      - name: start crc
+        working-directory: ${{ env.CRC_DIR }}
+        continue-on-error: true
+        run: |
+          set -x
+          crc start --memory 12288 --pull-secret-file secret
+          crc status
+          sleep 5m
+          #timeout 300 sh -c 'until [ $(crc status|grep "OpenShift:"|grep -sq "Running") ]; do sleep 10 && echo "waiting for ocp to be ready"; done'
+          crc oc-env
+          crc status
+          eval $(./crc oc-env)
+          grep -Eo -- "oc login -u kubeadmin -p [0-9A-Za-z]{5}-[0-9A-Za-z]{5}-[0-9A-Za-z]{5}-[0-9A-Za-z]{5} https://api.crc.testing:6443" start > adminlogin
+          eval $(cat adminlogin) --insecure-skip-tls-verify
+          oc get nodes --insecure-skip-tls-verify
+          oc cluster-info --insecure-skip-tls-verify
+          oc get pods -n kube-system --insecure-skip-tls-verify
+          cat ~/.crc/crc.log
+
+      - name: setup tmate session for debugging
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
