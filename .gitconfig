@@ -1,0 +1,37 @@
+[user]
+	name = Sébastien Han
+	email = seb@redhat.com
+	signingkey = /Users/leseb/.ssh/id_rsa
+[push]
+	default = simple
+	autoSetupRemote = true
+[color]
+   ui = auto
+[color "diff"]
+   whitespace = red reverse bold
+   meta = white blue
+[alias]
+      lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)%Creset' --abbrev-commit
+      wdiff = diff --word-diff
+      staged = diff --staged
+      prom = pull --rebase origin master
+      pr = !"pr() { git fetch origin pull/$1/head:pr-$1; }; pr"
+	fpush = push
+[http]
+	sslVerify = true
+[commit]
+  verbose = true
+	cleanup = scissors
+	gpgSign = true
+[core]
+	editor = /usr/bin/vim
+	excludesfile = /Users/leseb/.gitignore_global
+[rerere]
+	enabled = true
+[help]
+	autocorrect = immediate
+[diff]
+	algorithm = histogram
+	colorMoved = default
+[gpg]
+	format = ssh
